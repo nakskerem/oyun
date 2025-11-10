@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fazocan'ın Sürpriz Hikayesi</title>
+<title>Fazocan’ın Sürpriz Hikayesi</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
 <style>
 body {
@@ -18,9 +18,9 @@ body {
   overflow:hidden;
 }
 h1 {
-  margin-top:40px;
+  margin-top:30px;
   color:#333;
-  font-size:2em;
+  font-size:1.8em;
   text-align:center;
   text-shadow:0 2px 5px rgba(0,0,0,0.15);
 }
@@ -74,11 +74,11 @@ canvas {
 </head>
 <body>
 
-<h1>Fazocan'ın Sürpriz Hikayesi</h1>
-<div id="story">Merhaba Fazocan! Küçük karakterimiz doğum günü pastasını taşımaya başladı. Hangi yolu seçmesini istersin?</div>
+<h1>Fazocan’ın Sürpriz Hikayesi</h1>
+<div id="story">Merhaba Fazocan! Bugün senin için özel bir sürpriz hazırladım. Hangi pastayı seçelim?</div>
 <div class="button-container" id="choices">
-  <button class="choice-btn" data-choice="left">Sol Yol</button>
-  <button class="choice-btn" data-choice="right">Sağ Yol</button>
+  <button class="choice-btn" data-choice="chocolate">Çikolatalı 🍫</button>
+  <button class="choice-btn" data-choice="strawberry">Çilekli 🍓</button>
 </div>
 <div id="finalMessage">🎉 Fazocan, seninle dostluğumuz hep baki! ❤️</div>
 
@@ -94,26 +94,32 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let step = 0;
+let taskCompleted = false;
 
-// Buton tıklama fonksiyonu
+// Oyun akışı
 function nextStep(choice){
   step++;
   if(step===1){
-    if(choice==='left'){
-      story.innerText = "Karakter sol yolu seçti ve ormanda ilerledi. Karşısına renkli bir nehir çıktı. Hangi köprüden geçmeli?";
+    if(choice==='chocolate'){
+      story.innerText = "Mmm, çikolatalı pasta harika! Şimdi pastanın üzerine hangi mumları koyalım?";
     } else {
-      story.innerText = "Karakter sağ yolu seçti ve çiçekli bir tarlaya geldi. Hangi çiçekten geçmeli?";
+      story.innerText = "Çilekli pasta seçildi! Şimdi pastanın üzerine hangi mumları koyalım?";
     }
-    choices.innerHTML = '<button class="choice-btn" data-choice="option1">1. Seçenek</button><button class="choice-btn" data-choice="option2">2. Seçenek</button>';
-    addChoiceListeners(); // yeni butonlar için listener ekle
+    choices.innerHTML = '<button class="choice-btn" data-choice="mums">Tüm mumları ekle 🕯️</button>';
+    addChoiceListeners();
   } else if(step===2){
-    story.innerText = "Harika seçim! Karakter yavaşça hedefe yaklaşıyor...";
+    story.innerText = "Harika! Mumları ekledik. Şimdi dileğini dile ve 'SÖNDÜR' tuşuna bas!";
+    choices.innerHTML = '<button class="choice-btn" data-choice="blow">SÖNDÜR 🕯️</button>';
+    addChoiceListeners();
+  } else if(step===3){
+    taskCompleted = true;
     choices.style.display='none';
-    setTimeout(showFinalMessage,1500);
+    story.innerText = "Mumlar söndü! Bakalım sürpriz seni bekliyor...";
+    setTimeout(showFinalMessage,1200);
   }
 }
 
-// Butonlara listener ekleme
+// Butonlar için listener
 function addChoiceListeners(){
   const btns = document.querySelectorAll('.choice-btn');
   btns.forEach(btn=>{
@@ -123,7 +129,7 @@ function addChoiceListeners(){
   });
 }
 
-// İlk butonlar için listener
+// İlk butonlar
 addChoiceListeners();
 
 // Final mesaj ve animasyon
