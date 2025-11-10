@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fazocan'ın Sürpriz Hikayesi</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body {
+  margin:0;
+  padding:0 10px;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #fdfdfd, #e6f0ff);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  min-height:100vh;
+  overflow:hidden;
+}
+h1 {
+  margin-top:40px;
+  color:#333;
+  font-size:2em;
+  text-align:center;
+  text-shadow:0 2px 5px rgba(0,0,0,0.15);
+}
+#story {
+  margin-top:20px;
+  font-size:1.1em;
+  background: rgba(255,255,255,0.95);
+  padding:15px 20px;
+  border-radius:15px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.2);
+  max-width:95%;
+  text-align:center;
+}
+.button-container {
+  margin-top:15px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.choice-btn {
+  padding:10px 20px;
+  font-size:1em;
+  border:none;
+  border-radius:12px;
+  background: linear-gradient(135deg, #ff6b6b, #ff4757);
+  color:white;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  transition:0.3s;
+}
+.choice-btn:hover { transform: scale(1.05);}
+#finalMessage {
+  display:none;
+  margin-top:20px;
+  font-size:1.3em;
+  color:#ff6b6b;
+  font-weight:bold;
+  text-align:center;
+}
+canvas {
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none;
+  z-index:999;
+}
+</style>
+</head>
+<body>
+
+<h1>Fazocan'ın Sürpriz Hikayesi</h1>
+<div id="story">Merhaba Fazocan! Küçük karakterimiz doğum günü pastasını taşımaya başladı. Hangi yolu seçmesini istersin?</div>
+<div class="button-container" id="choices">
+  <button class="choice-btn" data-choice="left">Sol Yol</button>
+  <button class="choice-btn" data-choice="right">Sağ Yol</button>
+</div>
+<div id="finalMessage">🎉 Fazocan, seninle dostluğumuz hep baki! ❤️</div>
+
+<canvas id="animationCanvas"></canvas>
+
+<script>
+const story = document.getElementById('story');
+const choices = document.getElementById('choices');
+const finalMessage = document.getElementById('finalMessage');
+const canvas = document.getElementById('animationCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// Hikaye akışı
+let step = 0;
+
+function nextStep(choice){
+  step++;
+  if(step===1){
+    if(choice==='left'){
+      story.innerText = "Karakter sol yolu seçti ve ormanda ilerledi. Karşısına renkli bir nehir çıktı. Hangi köprüden geçmeli?";
+    } else {
+      story.innerText = "Karakter sağ yolu seçti ve çiçekli bir tarlaya geldi. Hangi çiçekten geçmeli?";
+    }
+    choices.innerHTML = '<button class="choice-btn" data-choice="option1">1. Seçenek</button><button class="choice-btn" data-choice="option2">2. Seçenek</button>';
+    addChoiceListeners();
+  } else if(step===2){
+    story.innerText = "Harika seçim! Karakter yavaşça hedefe yaklaşıyor...";
+    choices.style.display='none';
+    setTimeout(showFinalMessage,1500);
+  }
+}
+
+function showFinalMessage(){
+  finalMessage.style.display='block';
+  startConfetti();
+  launchBalloons();
+}
+
+// Choice butonlarını dinle
+function addChoiceListeners(){
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      nextStep(btn.dataset.choice);
+    });
+  });
+}
+
+addChoiceListeners();
+
+// Confetti
+const confettiParticles=[];
+function startConfetti(){
+  for(let i=0;i<200;i++){
+    confettiParticles.push({
+      x:Math.random()*canvas.width,
+      y:Math.random()*canvas.height - 200,
+      size:Math.random()*8+3,
+      speed:Math.random()*4+2,
+      angle:Math.random()*360,
+      color:`hsl(${Math.random()*360},100%,50%)`,
+      tilt:Math.random()*10-5
+    });
+  }
+  requestAnimationFrame(drawConfetti);
+}
+function drawConfetti(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  confettiParticles.forEach(p=>{
+    ctx.save();
+    ctx.fillStyle=p.color;
+    ctx.translate(p.x,p.y);
+    ctx.rotate(p.angle*Math.PI/180);
+    ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+    ctx.restore();
+    p.y += p.speed;
+    p.angle += 2;
+    if(p.y>canvas.height) p.y=0;
+  });
+  requestAnimationFrame(drawConfetti);
+}
+
+// Balonlar
+const balloons=[];
+function launchBalloons(){
+  for(let i=0;i<15;i++){
+    balloons.push({
+      x:Math.random()*(canvas.width-100)+50,
+      y:canvas.height + 50 + Math.random()*100,
+      radiusX:25,
+      radiusY:35,
+      speed:1 + Math.random()*1.5,
+      color: '#ff6b6b',
+      sway: 2 + Math.random()*1,
+      swayDir: Math.random()<0.5 ? -1 : 1
+    });
+  }
+  requestAnimationFrame(drawBalloons);
+}
+function drawBalloons(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  confettiParticles.forEach(p=>{
+    ctx.save();
+    ctx.fillStyle=p.color;
+    ctx.translate(p.x,p.y);
+    ctx.rotate(p.angle*Math.PI/180);
+    ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+    ctx.restore();
+    p.y += p.speed;
+    p.angle += 2;
+    if(p.y>canvas.height) p.y=0;
+  });
+  
+  balloons.forEach(b=>{
+    b.x += Math.sin(b.y/60)*b.swayDir*b.sway;
+    b.y -= b.speed;
+    ctx.beginPath();
+    ctx.moveTo(b.x,b.y + b.radiusY);
+    ctx.lineTo(b.x, b.y + b.radiusY + 60);
+    ctx.strokeStyle='rgba(0,0,0,0.3)';
+    ctx.lineWidth=1.5;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.ellipse(b.x, b.y, b.radiusX, b.radiusY, 0, 0, 2*Math.PI);
+    const grd = ctx.createRad
