@@ -93,9 +93,9 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// Hikaye akışı
 let step = 0;
 
+// Buton tıklama fonksiyonu
 function nextStep(choice){
   step++;
   if(step===1){
@@ -105,7 +105,7 @@ function nextStep(choice){
       story.innerText = "Karakter sağ yolu seçti ve çiçekli bir tarlaya geldi. Hangi çiçekten geçmeli?";
     }
     choices.innerHTML = '<button class="choice-btn" data-choice="option1">1. Seçenek</button><button class="choice-btn" data-choice="option2">2. Seçenek</button>';
-    addChoiceListeners();
+    addChoiceListeners(); // yeni butonlar için listener ekle
   } else if(step===2){
     story.innerText = "Harika seçim! Karakter yavaşça hedefe yaklaşıyor...";
     choices.style.display='none';
@@ -113,13 +113,7 @@ function nextStep(choice){
   }
 }
 
-function showFinalMessage(){
-  finalMessage.style.display='block';
-  startConfetti();
-  launchBalloons();
-}
-
-// Choice butonlarını dinle
+// Butonlara listener ekleme
 function addChoiceListeners(){
   const btns = document.querySelectorAll('.choice-btn');
   btns.forEach(btn=>{
@@ -129,7 +123,15 @@ function addChoiceListeners(){
   });
 }
 
+// İlk butonlar için listener
 addChoiceListeners();
+
+// Final mesaj ve animasyon
+function showFinalMessage(){
+  finalMessage.style.display='block';
+  startConfetti();
+  launchBalloons();
+}
 
 // Confetti
 const confettiParticles=[];
@@ -197,12 +199,28 @@ function drawBalloons(){
   balloons.forEach(b=>{
     b.x += Math.sin(b.y/60)*b.swayDir*b.sway;
     b.y -= b.speed;
+    // ip
     ctx.beginPath();
     ctx.moveTo(b.x,b.y + b.radiusY);
     ctx.lineTo(b.x, b.y + b.radiusY + 60);
     ctx.strokeStyle='rgba(0,0,0,0.3)';
     ctx.lineWidth=1.5;
     ctx.stroke();
+    // balon
     ctx.beginPath();
     ctx.ellipse(b.x, b.y, b.radiusX, b.radiusY, 0, 0, 2*Math.PI);
-    const grd = ctx.createRad
+    const grd = ctx.createRadialGradient(b.x, b.y-5,5, b.x, b.y, Math.max(b.radiusX, b.radiusY));
+    grd.addColorStop(0,'#fff');
+    grd.addColorStop(1,b.color);
+    ctx.fillStyle = grd;
+    ctx.fill();
+    ctx.strokeStyle='rgba(0,0,0,0.1)';
+    ctx.stroke();
+  });
+  
+  if(!balloons.every(b => b.y + b.radiusY < -20)) requestAnimationFrame(drawBalloons);
+}
+</script>
+
+</body>
+</html>
